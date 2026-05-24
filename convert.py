@@ -145,7 +145,7 @@ CHAPTER_TEMPLATE = Template("""\
     <meta property="og:title" content="{{ title }} — OpenClaw Stack Guide">
     <meta property="og:description" content="OpenClaw Stack {{ title }}の解説">
     <meta property="og:type" content="article">
-    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta property="og:image" content="https://fukukei23.github.io/openclaw-stack-guide/assets/ogp.png">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="../assets/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
@@ -230,7 +230,7 @@ INDEX_TEMPLATE = Template("""\
     <meta property="og:title" content="OpenClaw Stack ガイド">
     <meta property="og:description" content="AIエージェントプラットフォーム OpenClaw Stack の構築・運用を初心者向けに完全解説">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta property="og:image" content="https://fukukei23.github.io/openclaw-stack-guide/assets/ogp.png">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="assets/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
@@ -289,7 +289,7 @@ INDEX_TEMPLATE = Template("""\
     </main>
 
     <footer class="site-footer">
-        <p>OpenClaw Stack Guide — <a href="https://github.com/<USERNAME>/openclaw-stack-guide">GitHub</a></p>
+        <p>OpenClaw Stack Guide — <a href="https://github.com/fukukei23/openclaw-stack-guide">GitHub</a></p>
     </footer>
 
     <script src="assets/script.js"></script>
