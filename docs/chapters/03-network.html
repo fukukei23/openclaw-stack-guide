@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ネットワーク — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack ネットワークの解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="ネットワーク — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack ネットワークの解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="02-architecture.html" class="nav-prev">← アーキテクチャ</a>
+            
+            
+            <a href="04-security-why.html" class="nav-next">なぜセキュリティが必要か →</a>
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>ネットワーク</h1>
+<h2>アドレスとポート</h2>
+<p>ネットワーク設定を理解することは、セキュリティの基礎です。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>コンポーネント</th>
+<th>IP/インターフェース</th>
+<th>ポート</th>
+<th>公開範囲</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Caddy HTTP</td>
+<td><code>0.0.0.0</code></td>
+<td>80/tcp</td>
+<td>全体公開</td>
+<td>HTTPSへリダイレクト</td>
+</tr>
+<tr>
+<td>Caddy HTTPS</td>
+<td><code>0.0.0.0</code></td>
+<td>443/tcp</td>
+<td>全体公開</td>
+<td>TLS終端 + BasicAuth</td>
+</tr>
+<tr>
+<td>SSH（レート制限付き）</td>
+<td><code>0.0.0.0</code></td>
+<td>22/tcp</td>
+<td>制限付き</td>
+<td>信頼できるIPのみ許可</td>
+</tr>
+<tr>
+<td>OpenClaw Gateway</td>
+<td><code>127.0.0.1</code></td>
+<td>18789/tcp</td>
+<td>内部のみ</td>
+<td>Caddyのみアクセス可能</td>
+</tr>
+</tbody>
+</table></div>
+<h3>ポートの「公開範囲」って？</h3>
+<ul>
+<li><strong>全体公開</strong>: インターネット上の誰でもアクセスできる</li>
+<li><strong>制限付き</strong>: アクセスはできるが、回数制限などがある</li>
+<li><strong>内部のみ</strong>: 同じマシン内のプログラムしかアクセスできない</li>
+</ul>
+<div class="mermaid-wrapper"><div class="mermaid">
+graph TD
+    subgraph "公開ポート"
+        P80["Port 80<br/>HTTP → HTTPSリダイレクト"]
+        P443["Port 443<br/>HTTPS（TLS終端）"]
+    end
+    subgraph "内部のみ"
+        G18789["Port 18789<br/>Gateway（ループバックのみ）"]
+    end
+    P80 -->|"リダイレクト"| P443
+    P443 -->|"プロキシ"| G18789
+</div></div><h2>トラフィック経路</h2>
+<h3>公開ルート（インターネットからのアクセス）</h3>
+<pre><code>インターネット → Caddy（80/443） → Gateway（ループバック）
+</code></pre>
+<h3>SSHトンネル（管理用）</h3>
+<pre><code class="language-bash"># ローカルPCからVPSのGatewayに直接アクセスする方法
+ssh -L 18789:127.0.0.1:18789 user@&lt;YOUR_VPS_IP&gt;
+curl http://localhost:18789/status
+</code></pre>
+<p>SSHトンネルを使うと、Gatewayポートを開放せずにローカルPCから直接確認できます。</p>
+<h2>UFW ファイアウォール</h2>
+<p>UFW（Uncomplicated Firewall）は、Ubuntu標準のファイアウォールです。</p>
+<h3>ルール設定</h3>
+<pre><code class="language-bash"># デフォルトですべての受信を拒否
+sudo ufw default deny incoming
+
+# 必要なポートだけ開ける
+sudo ufw allow 80/tcp      # HTTP（Caddy用）
+sudo ufw allow 443/tcp     # HTTPS（Caddy用）
+sudo ufw limit 22/tcp      # SSH（レート制限付きで brute-force 対策）
+sudo ufw deny 18789        # Gateway ポート（明示的拒否）
+
+# 有効化
+sudo ufw enable
+</code></pre>
+<h3><code>limit</code> とは？</h3>
+<p><code>limit</code> は「短時間に何度も接続してきたIPを自動ブロックする」設定です。SSHへの総当たり攻撃（ブルートフォース攻撃）を防ぎます。</p>
+<h2>確認コマンド</h2>
+<pre><code class="language-bash"># DNSが正しく向いているか
+dig +short example.com
+
+# Gateway が外部から見えないことを確認
+sudo nmap -p 18789 &lt;YOUR_VPS_IP&gt;     # → filtered/closed のはず
+
+# Gateway が内部からは見えることを確認
+sudo nmap -p 18789 127.0.0.1         # → open のはず
+
+# UFWのルール一覧
+sudo ufw status numbered
+</code></pre>
+<div class="callout callout-warn"><p><strong>注意</strong>: ファイアウォールルールを変更した後は <code>sudo ufw reload</code> で反映し、再度確認コマンドを実行して、意図しない公開がないかチェックしてください。</p></div>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="02-architecture.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">🏗️ アーキテクチャ</span>
+            </a>
+            
+            
+            <a href="04-security-why.html" class="nav-card next">
+                <span class="nav-label">次の章 →</span>
+                <span class="nav-title">🔒 なぜセキュリティが必要か</span>
+            </a>
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>

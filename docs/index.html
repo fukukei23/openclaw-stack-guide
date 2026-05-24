@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Stack ガイド</title>
+    <meta name="description" content="AIエージェントプラットフォーム OpenClaw Stack の構築・運用を初心者向けに完全解説">
+    <meta property="og:title" content="OpenClaw Stack ガイド">
+    <meta property="og:description" content="AIエージェントプラットフォーム OpenClaw Stack の構築・運用を初心者向けに完全解説">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body class="index-page">
+    <header class="site-header">
+        <span class="site-title">🤖 OpenClaw Stack Guide</span>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <main class="content">
+        <section class="hero">
+            <h1>OpenClaw Stack ガイド</h1>
+            <p>AIエージェントプラットフォーム OpenClaw Stack の<br>構築・運用を初心者向けに完全解説</p>
+        </section>
+
+        <section class="chapter-grid">
+            
+            <a href="chapters/00-cheatsheet.html" class="chapter-card">
+                <div class="card-icon">📋</div>
+                <div class="card-number">第00章</div>
+                <h2 class="card-title">早見表</h2>
+                <p class="card-desc">コマンド・ポート・ファイル一覧チートシート</p>
+            </a>
+            
+            <a href="chapters/01-basics.html" class="chapter-card">
+                <div class="card-icon">🤖</div>
+                <div class="card-number">第01章</div>
+                <h2 class="card-title">OpenClaw Stackとは</h2>
+                <p class="card-desc">AIエージェントプラットフォームの概要と2つの環境</p>
+            </a>
+            
+            <a href="chapters/02-architecture.html" class="chapter-card">
+                <div class="card-icon">🏗️</div>
+                <div class="card-number">第02章</div>
+                <h2 class="card-title">アーキテクチャ</h2>
+                <p class="card-desc">Docker・Caddy・Gatewayのシステム構成</p>
+            </a>
+            
+            <a href="chapters/03-network.html" class="chapter-card">
+                <div class="card-icon">🌐</div>
+                <div class="card-number">第03章</div>
+                <h2 class="card-title">ネットワーク</h2>
+                <p class="card-desc">ポート・ドメイン・ファイアウォール設定</p>
+            </a>
+            
+            <a href="chapters/04-security-why.html" class="chapter-card">
+                <div class="card-icon">🔒</div>
+                <div class="card-number">第04章</div>
+                <h2 class="card-title">なぜセキュリティが必要か</h2>
+                <p class="card-desc">4層防御を初心者向けに解説</p>
+            </a>
+            
+            <a href="chapters/05-security-ai.html" class="chapter-card">
+                <div class="card-icon">🛡️</div>
+                <div class="card-number">第05章</div>
+                <h2 class="card-title">AIの8つの安全装置</h2>
+                <p class="card-desc">PIIマスキング・RBAC・サンドボックス等を例えで解説</p>
+            </a>
+            
+            <a href="chapters/06-security-portfolio.html" class="chapter-card">
+                <div class="card-icon">🔐</div>
+                <div class="card-number">第06章</div>
+                <h2 class="card-title">セキュリティ設計</h2>
+                <p class="card-desc">技術的なセキュリティ設計と環境別比較</p>
+            </a>
+            
+            <a href="chapters/07-deployment.html" class="chapter-card">
+                <div class="card-icon">🚀</div>
+                <div class="card-number">第07章</div>
+                <h2 class="card-title">デプロイ手順</h2>
+                <p class="card-desc">VPSへのデプロイ手順（Docker・Caddy・初期設定）</p>
+            </a>
+            
+            <a href="chapters/08-local-setup.html" class="chapter-card">
+                <div class="card-icon">💻</div>
+                <div class="card-number">第08章</div>
+                <h2 class="card-title">ローカル環境構築</h2>
+                <p class="card-desc">Surface Go等でのローカル開発環境構築</p>
+            </a>
+            
+            <a href="chapters/09-operations.html" class="chapter-card">
+                <div class="card-icon">🔧</div>
+                <div class="card-number">第09章</div>
+                <h2 class="card-title">運用手順</h2>
+                <p class="card-desc">ヘルスチェック・ログ・トラブルシューティング</p>
+            </a>
+            
+            <a href="chapters/10-checklist.html" class="chapter-card">
+                <div class="card-icon">✅</div>
+                <div class="card-number">第10章</div>
+                <h2 class="card-title">チェックリスト</h2>
+                <p class="card-desc">デプロイ前後の確認項目一覧</p>
+            </a>
+            
+        </section>
+
+        <section class="features">
+            <h2>📖 このガイドの特徴</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">🎯</span>
+                    <h3>初心者向け</h3>
+                    <p>専門用語は初出時に説明。前提知識不要</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <h3>図解付き</h3>
+                    <p>アーキテクチャやセキュリティを図で視覚化</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📱</span>
+                    <h3>モバイル対応</h3>
+                    <p>スマホからいつでも見返せるレスポンシブデザイン</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🌙</span>
+                    <h3>ダークモード</h3>
+                    <p>目に優しいテーマ切替対応</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>OpenClaw Stack Guide — <a href="https://github.com/<USERNAME>/openclaw-stack-guide">GitHub</a></p>
+    </footer>
+
+    <script src="assets/script.js"></script>
+</body>
+</html>

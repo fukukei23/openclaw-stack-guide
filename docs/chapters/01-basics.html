@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Stackとは — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack OpenClaw Stackとはの解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="OpenClaw Stackとは — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack OpenClaw Stackとはの解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="00-cheatsheet.html" class="nav-prev">← 早見表</a>
+            
+            
+            <a href="02-architecture.html" class="nav-next">アーキテクチャ →</a>
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>OpenClaw Stackとは</h1>
+<h2>概要</h2>
+<p><strong>OpenClaw Stack</strong>は、AIエージェントプラットフォーム「OpenClaw」をVPSやローカルPCで安全に構築・運用するためのインフラ構成です。</p>
+<ul>
+<li><strong>OpenClaw</strong>は、AIが自律的にタスクを実行するプラットフォーム</li>
+<li><strong>Stack</strong>は、それを動かすためのインフラ（Docker、Caddy、ネットワーク設定等）のまとまり</li>
+</ul>
+<p>このガイドでは、初心者の方にも分かるように、OpenClaw Stackの構築・運用を解説します。</p>
+<h2>用語解説</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>用語</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AIエージェント</strong></td>
+<td>ユーザーの指示に従って自律的に作業を行うAIプログラム</td>
+</tr>
+<tr>
+<td><strong>VPS</strong></td>
+<td>Virtual Private Server（仮想専用サーバー）。インターネットに公開される</td>
+</tr>
+<tr>
+<td><strong>Docker</strong></td>
+<td>アプリを「コンテナ」という箱に入れて動かす仕組み</td>
+</tr>
+<tr>
+<td><strong>Caddy</strong></td>
+<td>リバースプロキシ。インターネットからの通信を中継する門番</td>
+</tr>
+<tr>
+<td><strong>TLS/HTTPS</strong></td>
+<td>通信を暗号化する仕組み。ブラウザの鍵マーク</td>
+</tr>
+<tr>
+<td><strong>Gateway</strong></td>
+<td>OpenClawの本体。AIエージェントの実行環境</td>
+</tr>
+<tr>
+<td><strong>BasicAuth</strong></td>
+<td>IDとパスワードによる認証</td>
+</tr>
+</tbody>
+</table></div>
+<div class="mermaid-wrapper"><div class="mermaid">
+graph LR
+    subgraph "VPS（本番）"
+        V_INTERNET["🌐 インターネット"]
+        V_UFW["🧱 UFW ファイアウォール"]
+        V_CADDY["🔑 Caddy<br/>TLS + BasicAuth"]
+        V_GW["🤖 OpenClaw Gateway<br/>:18789"]
+        V_API["☁️ LLM API"]
+        V_INTERNET --> V_UFW --> V_CADDY --> V_GW --> V_API
+    end
+</div></div><h2>2つの構成環境</h2>
+<p>OpenClaw Stackは <strong>2つの異なる環境</strong> で動かせます。</p>
+<h3>VPS（本番環境）</h3>
+<p>インターネットに公開されたサーバーで常時稼働します。4層のセキュリティで守られます。</p>
+<ul>
+<li><strong>用途</strong>: 本番・常時稼働</li>
+<li><strong>外部公開</strong>: あり（HTTPS）</li>
+<li><strong>コンテナ数</strong>: 2（Caddy + Gateway）</li>
+<li><strong>セキュリティ</strong>: 4層防御（ファイアウォール + TLS + BasicAuth + Token）</li>
+</ul>
+<h3>ローカルPC（開発環境）</h3>
+<p>お手持ちのLinuxマシンで動かします。インターネットには公開しないため、セキュリティ要件は軽めです。</p>
+<ul>
+<li><strong>用途</strong>: ローカル開発・実験</li>
+<li><strong>外部公開</strong>: なし（ローカルのみ）</li>
+<li><strong>コンテナ数</strong>: 1（Gatewayのみ）</li>
+<li><strong>セキュリティ</strong>: ネットワーク分離 + Token</li>
+</ul>
+<h3>なぜ2つあるのか</h3>
+<p>VPSは「世界中からアクセスできる場所」なので、厳重なセキュリティが必要です。ローカルPCは「自分しか使わない場所」なので、最低限のセキュリティで十分です。</p>
+<p>用途に合わせて適切なセキュリティレベルを選ぶのが大切です。</p>
+<h2>AIエージェントの危険性</h2>
+<p>OpenClawのAIエージェントは、ユーザーの権限で様々な操作を実行できます：</p>
+<ul>
+<li>メールの送信</li>
+<li>ファイルの読み書き・削除</li>
+<li>外部APIの呼び出し（決済を含む）</li>
+<li>Webスクレイピング</li>
+<li>SNSへの投稿</li>
+</ul>
+<p><strong>これが乗っ取られたら、あなたの代わりに攻撃者が何でもできてしまいます。</strong></p>
+<p>だからこそ、このガイドではセキュリティに重点を置いて解説します。</p>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="00-cheatsheet.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">📋 早見表</span>
+            </a>
+            
+            
+            <a href="02-architecture.html" class="nav-card next">
+                <span class="nav-label">次の章 →</span>
+                <span class="nav-title">🏗️ アーキテクチャ</span>
+            </a>
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>

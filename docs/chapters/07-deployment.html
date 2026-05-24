@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デプロイ手順 — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack デプロイ手順の解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="デプロイ手順 — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack デプロイ手順の解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="06-security-portfolio.html" class="nav-prev">← セキュリティ設計</a>
+            
+            
+            <a href="08-local-setup.html" class="nav-next">ローカル環境構築 →</a>
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>デプロイ手順</h1>
+<div class="callout callout-info"><p>VPSにOpenClaw Stackをデプロイする手順を解説します。</p></div>
+<h2>手順1: VPSの準備</h2>
+<p>まず、VPSに必要なパッケージをインストールします。</p>
+<pre><code class="language-bash"># システムアップデート
+sudo apt update &amp;&amp; sudo apt upgrade -y
+
+# 必要パッケージのインストール
+sudo apt install -y ufw fail2ban git curl
+
+# デプロイ用ユーザーの作成
+sudo adduser deployer &amp;&amp; sudo usermod -aG sudo deployer
+</code></pre>
+<h3>SSH鍵の設定</h3>
+<pre><code class="language-bash"># SSH鍵をコピー
+# ローカルPCから:
+ssh-copy-id deployer@&lt;YOUR_VPS_IP&gt;
+</code></pre>
+<h3>SSH セキュリティ強化</h3>
+<p><code>/etc/ssh/sshd_config</code> を編集：</p>
+<pre><code>PermitRootLogin no
+PasswordAuthentication no
+</code></pre>
+<pre><code class="language-bash">sudo systemctl reload sshd
+</code></pre>
+<div class="callout callout-warn"><p><strong>注意</strong>: SSH設定を間違えるとログインできなくなります。新しいターミナルで接続確認してから、古いターミナルを閉じてください。</p></div>
+<h2>手順2: Docker &amp; Docker Compose のインストール</h2>
+<pre><code class="language-bash"># Docker公式スクリプトでインストール
+curl -fsSL https://get.docker.com | sh
+
+# deployerユーザーをdockerグループに追加
+sudo usermod -aG docker deployer
+
+# Docker Compose プラグイン
+sudo apt install -y docker-compose-plugin
+</code></pre>
+<p>インストール確認：</p>
+<pre><code class="language-bash">docker --version
+docker compose version
+</code></pre>
+<h2>手順3: プロジェクトのセットアップ</h2>
+<pre><code class="language-bash"># プロジェクトディレクトリ作成
+sudo mkdir -p /opt/openclaw
+sudo chown deployer:deployer /opt/openclaw
+cd /opt/openclaw
+</code></pre>
+<h3>docker-compose.yml の作成</h3>
+<pre><code class="language-yaml">services:
+  caddy:
+    image: caddy:2
+    ports: [&quot;80:80&quot;, &quot;443:443&quot;]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [gateway]
+  gateway:
+    image: openclaw/gateway:2026.2.18
+    environment:
+      - OPENCLAW_GATEWAY_TOKEN=${GATEWAY_TOKEN}
+    command: [&quot;openclaw&quot;,&quot;gateway&quot;,&quot;start&quot;,&quot;--bind&quot;,&quot;127.0.0.1:18789&quot;]
+    expose: [&quot;18789&quot;]
+volumes:
+  caddy_data:
+  caddy_config:
+</code></pre>
+<h3>Caddyfile の作成</h3>
+<pre><code class="language-caddyfile">example.com {
+    encode gzip
+    basicauth {
+        deployer $HASHED_PASSWORD
+    }
+    reverse_proxy 127.0.0.1:18789
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
+</code></pre>
+<h3>.env ファイルの作成</h3>
+<pre><code class="language-bash"># .envファイルは絶対にGitにコミットしない
+echo &quot;GATEWAY_TOKEN=&lt;your-secure-random-token&gt;&quot; &gt; .env
+chmod 600 .env
+</code></pre>
+<h2>手順4: ファイアウォール設定</h2>
+<pre><code class="language-bash">sudo ufw default deny incoming
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw limit 22/tcp
+sudo ufw deny 18789
+sudo ufw enable
+sudo ufw status
+</code></pre>
+<h2>手順5: コンテナ起動</h2>
+<pre><code class="language-bash">cd /opt/openclaw
+docker compose pull
+docker compose up -d
+</code></pre>
+<p>起動確認：</p>
+<pre><code class="language-bash"># コンテナ状態
+docker compose ps
+
+# ログ確認
+docker compose logs -f gateway
+</code></pre>
+<h2>手順6: 動作確認</h2>
+<pre><code class="language-bash"># HTTPS + BasicAuth でステータス確認
+curl -u deployer:&lt;password&gt; https://example.com/status
+# → {&quot;health&quot;:&quot;ok&quot;} が返れば成功
+</code></pre>
+<h2>ロールバック方法</h2>
+<p>アップデートに失敗した場合：</p>
+<pre><code class="language-bash"># コンテナ停止
+docker compose down
+
+# 既知の安定バージョンを指定して再起動
+docker compose up -d
+</code></pre>
+<div class="callout callout-tip"><p><strong>Tip</strong>: イメージのバックアップを取っておくと安心です：
+<code>docker save openclaw/gateway:2026.2.18 &gt; gateway.tar</code></p></div>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="06-security-portfolio.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">🔐 セキュリティ設計</span>
+            </a>
+            
+            
+            <a href="08-local-setup.html" class="nav-card next">
+                <span class="nav-label">次の章 →</span>
+                <span class="nav-title">💻 ローカル環境構築</span>
+            </a>
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>

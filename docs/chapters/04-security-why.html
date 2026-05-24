@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>なぜセキュリティが必要か — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack なぜセキュリティが必要かの解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="なぜセキュリティが必要か — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack なぜセキュリティが必要かの解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="03-network.html" class="nav-prev">← ネットワーク</a>
+            
+            
+            <a href="05-security-ai.html" class="nav-next">AIの8つの安全装置 →</a>
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>なぜセキュリティが必要か</h1>
+<div class="callout callout-info"><p>OpenClaw StackのVPS環境では、4つのセキュリティレイヤーを重ねて構築しています。
+なぜそんなに重ねる必要があるのか、初心者向けに解説します。</p></div>
+<h2>前提: AIエージェントは危険</h2>
+<p>OpenClawはAIエージェントプラットフォームであり、ユーザーの権限で様々な操作を実行できます：</p>
+<ul>
+<li>メールの送信</li>
+<li>ファイルの読み書き・削除</li>
+<li>外部APIの呼び出し（決済を含む）</li>
+<li>Webスクレイピング</li>
+<li>SNSへの投稿</li>
+</ul>
+<p><strong>これが乗っ取られたら、あなたの代わりに攻撃者が何でもできてしまいます。</strong></p>
+<p>だからこそ、多重防御（Defense in Depth）で守る必要があるのです。</p>
+<div class="mermaid-wrapper"><div class="mermaid">
+graph TD
+    L1["🧱 レイヤー1: UFW ファイアウォール<br/>80/443のみ公開"]
+    L2["🔐 レイヤー2: TLS/HTTPS<br/>通信暗号化"]
+    L3["🔑 レイヤー3: BasicAuth<br/>ID/パスワード認証"]
+    L4["🎫 レイヤー4: Token + ペアリング<br/>Gateway認証"]
+    L1 --> L2 --> L3 --> L4
+    style L1 fill:#e3f2fd
+    style L2 fill:#e8f5e9
+    style L3 fill:#fff3e0
+    style L4 fill:#fce4ec
+</div></div><h2>4層防御の全体像</h2>
+<h2>レイヤー1: UFW ファイアウォール（80/443のみ公開）</h2>
+<h3>例え: マンションの「エントランス」</h3>
+<p>住人以外は建物に入れないエントランス。</p>
+<h3>なぜ必要か</h3>
+<p>OpenClaw Gateway はポート18789で動いています。これをインターネットにそのまま晒すと、世界中の誰もが「OpenClawが動いている」と分かって攻撃を仕掛けられます。</p>
+<p>UFWは「Webページを見るための2つのドア（80と443）だけ開けて、残りは全て閉める」という役割。18789番のドアは外側から見えなくなります。</p>
+<p><strong>攻撃者に「ここにAIエージェントがいる」と気づかせないため。</strong></p>
+<h3>これがないとどうなるか</h3>
+<p>攻撃者がポートスキャンで18789番を発見し、Gatewayに直接攻撃を仕掛けられます。</p>
+<hr />
+<h2>レイヤー2: Caddy TLS（HTTPS暗号化）</h2>
+<h3>例え: 郵便物を「透明な袋」ではなく「封筒」に入れて届ける</h3>
+<h3>なぜ必要か</h3>
+<p>HTTP（暗号化なし）で通信すると、ユーザーとサーバー間のやり取りがネットワーク上を裸で流れます：</p>
+<ul>
+<li>AIに話しかけた内容が丸見え</li>
+<li>AIの返事も丸見え</li>
+<li>途中で通信を書き換える攻撃が可能</li>
+</ul>
+<p>HTTPS（TLS暗号化）は通信内容を暗号化して、関係者以外には読めなくします。</p>
+<p><strong>通信を傍受されるのを防ぐため。</strong></p>
+<h3>これがないとどうなるか</h3>
+<p>Wi-Fiアクセスポイントやプロバイダ経由で、AIとの会話内容やAPIキーが第三者に漏洩します。</p>
+<hr />
+<h2>レイヤー3: HTTP BasicAuth（ID/パスワード認証）</h2>
+<h3>例え: マンションの「オートロック」</h3>
+<p>住所（URL）を知っていても、鍵（パスワード）がないと入れない。</p>
+<h3>なぜ必要か</h3>
+<p><code>https://example.com</code> というURLは、理論上は世界中の誰でもアクセスできます。URLを知っているだけで中に入れたら危険です。</p>
+<p>BasicAuthはURLにアクセスした瞬間にユーザー名とパスワードを聞くゲート。正しい組み合わせを入れないと、中にあるOpenClawの画面すら見えません。</p>
+<p><strong>URLが漏洩しても、パスワードが分からなければ侵入できない。</strong></p>
+<h3>これがないとどうなるか</h3>
+<p>URLを知るだけで、誰でもAIエージェントを操作できます。</p>
+<hr />
+<h2>レイヤー4: Gateway Token + デバイスペアリング</h2>
+<h3>例え: 部屋の「鍵」</h3>
+<p>オートロックを通っても、部屋に入るには専用の鍵が必要。さらに、登録された鍵しかドアに刺さらない。</p>
+<h3>なぜ必要か</h3>
+<p>BasicAuthを突破されたとしても、OpenClaw自身にもう一つの認証があります：</p>
+<ul>
+<li><strong>Gateway Token</strong>: OpenClaw独自の認証トークン（APIキーのようなもの）</li>
+<li><strong>デバイスペアリング</strong>: 「この端末だけ許可する」という設定。事前に承認したデバイス以外は接続できない</li>
+</ul>
+<p><strong>万が一BasicAuthが突破されても、OpenClaw自身が弾く最後の砦。</strong></p>
+<h3>これがないとどうなるか</h3>
+<p>BasicAuth突破後、無防備な状態でAIエージェントが操作されます。</p>
+<hr />
+<h2>まとめ</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>層</th>
+<th>防ぐ脅威</th>
+<th>これがないとどうなるか</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. UFW</strong></td>
+<td>ポートスキャン・直接攻撃</td>
+<td>攻撃者が18789番を直接叩ける</td>
+</tr>
+<tr>
+<td><strong>2. TLS</strong></td>
+<td>通信傍受・盗聴</td>
+<td>AIとの会話・APIキーが丸見え</td>
+</tr>
+<tr>
+<td><strong>3. BasicAuth</strong></td>
+<td>URL漏洩からの侵入</td>
+<td>URLを知るだけでAIを操作できる</td>
+</tr>
+<tr>
+<td><strong>4. Token+ペアリング</strong></td>
+<td>認証突破後の不正利用</td>
+<td>BasicAuth突破後、無防備</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>「鍵を1つだけ掛けるより、4つ掛けた方が安全」</strong> という考えです。</p>
+<p>AIエージェントはユーザーの権限で動くため、乗っ取られると最悪の場合：</p>
+<ul>
+<li>勝手にメール送信</li>
+<li>データ削除</li>
+<li>金銭的被害（API利用料の不正消費）</li>
+<li>情報漏洩</li>
+</ul>
+<p>が起きる可能性があります。だからこそ多重防御が必要なのです。</p>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="03-network.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">🌐 ネットワーク</span>
+            </a>
+            
+            
+            <a href="05-security-ai.html" class="nav-card next">
+                <span class="nav-label">次の章 →</span>
+                <span class="nav-title">🛡️ AIの8つの安全装置</span>
+            </a>
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>

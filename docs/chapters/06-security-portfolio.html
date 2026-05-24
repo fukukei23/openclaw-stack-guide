@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セキュリティ設計 — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack セキュリティ設計の解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="セキュリティ設計 — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack セキュリティ設計の解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="05-security-ai.html" class="nav-prev">← AIの8つの安全装置</a>
+            
+            
+            <a href="07-deployment.html" class="nav-next">デプロイ手順 →</a>
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>セキュリティ設計</h1>
+<div class="callout callout-info"><p>OpenClaw Stack のセキュリティ設計における技術的判断と実装内容をまとめた文書です。
+Defense in Depth（多層防御）の実践例として参照できます。</p></div>
+<h2>設計判断: Defense in Depth（多層防御）</h2>
+<p>AIエージェントはユーザーの権限で動作するため、乗っ取られると重大な被害が発生します：</p>
+<ul>
+<li>勝手なメール送信・SNS投稿</li>
+<li>ファイルの読み取り・削除</li>
+<li>外部APIの不正呼び出し（決済を含む）</li>
+<li>機密情報の漏洩</li>
+</ul>
+<p>単一のセキュリティ対策では不十分であり、各層が独立して機能する多重防御を採用しています。</p>
+<h2>実装した4層防御</h2>
+<h3>レイヤー1: ネットワーク層（UFW ファイアウォール）</h3>
+<p><strong>脅威</strong>: ポートスキャンによるサービス発見、直接攻撃</p>
+<pre><code class="language-bash"># UFW ルール
+ufw default deny incoming
+ufw allow 80/tcp      # HTTP（Caddy用）
+ufw allow 443/tcp     # HTTPS（Caddy用）
+ufw limit 22/tcp      # SSH（レート制限付き）
+ufw deny 18789        # Gateway ポート（明示的拒否）
+</code></pre>
+<p><strong>設計判断</strong>:</p>
+<ul>
+<li>Gateway（18789）をループバック（127.0.0.1）のみにバインド</li>
+<li>外部からの直接アクセスをネットワーク層で遮断</li>
+<li>Dockerのポートマッピングも <code>127.0.0.1:18789:18789</code> で内部のみ</li>
+</ul>
+<h3>レイヤー2: トランスポート層（TLS/HTTPS暗号化）</h3>
+<p><strong>脅威</strong>: 通信傍受、中間者攻撃（MITM）、データ漏洩</p>
+<pre><code class="language-caddyfile">example.com {
+    encode gzip
+    # CaddyがLet's Encryptから自動で証明書を取得・更新
+    # 明示的なTLS設定不要（Auto HTTPS）
+}
+</code></pre>
+<p><strong>設計判断</strong>:</p>
+<ul>
+<li>リバースプロキシにCaddyを採用（Auto HTTPSで運用コストゼロ）</li>
+<li>Let's Encryptによる無料証明書を自動取得・自動更新</li>
+<li>HTTP→HTTPSリダイレクトもCaddyが自動処理</li>
+</ul>
+<h3>レイヤー3: アプリケーション層（HTTP BasicAuth）</h3>
+<p><strong>脅威</strong>: URL漏洩による不正アクセス</p>
+<pre><code class="language-bash"># パスワードハッシュの生成
+echo &quot;$PASSWORD&quot; | docker run -i --rm caddy:2 hash-password
+</code></pre>
+<pre><code class="language-caddyfile">example.com {
+    basicauth {
+        deployer $HASHED_PASSWORD
+    }
+}
+</code></pre>
+<p><strong>設計判断</strong>:</p>
+<ul>
+<li>アプリケーションレベルでのアクセス制御</li>
+<li>CaddyのBasicAuth機能を使用（追加ミドルウェア不要）</li>
+<li>パスワードはbcryptハッシュで保存</li>
+</ul>
+<h3>レイヤー4: サービス層（Gateway Token + デバイスペアリング）</h3>
+<p><strong>脅威</strong>: 認証突破後の不正操作、端末の乗っ取り</p>
+<p><strong>設計判断</strong>:</p>
+<ul>
+<li>トークンベース認証（環境変数で管理、Gitには含めない）</li>
+<li>デバイスペアリングで許可された端末のみ接続可能</li>
+<li>トークンの定期ローテーションを推奨</li>
+</ul>
+<div class="mermaid-wrapper"><div class="mermaid">
+graph TD
+    INET["🌐 インターネット"] --> UFW["🧱 UFW<br/>80/443のみ許可"]
+    UFW --> CADDY_TLS["🔐 Caddy<br/>TLS終端 + Auto HTTPS"]
+    CADDY_TLS --> CADDY_AUTH["🔑 Caddy<br/>BasicAuth認証"]
+    CADDY_AUTH --> NET["📦 Docker Network<br/>172.30.0.0/24"]
+    NET --> GW["🤖 OpenClaw Gateway<br/>Token + デバイスペアリング"]
+    GW --> LLM["☁️ LLM API"]
+</div></div><h2>アーキテクチャ図</h2>
+<h2>環境別セキュリティ比較</h2>
+<p>VPSとローカルPCでは、脅威モデルが異なるため異なるセキュリティ構成を採用しています。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>セキュリティ層</th>
+<th>VPS（本番）</th>
+<th>ローカルPC（開発）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UFW ファイアウォール</td>
+<td>あり（80/443のみ公開）</td>
+<td>不要（ローカルネットのみ）</td>
+</tr>
+<tr>
+<td>TLS/HTTPS</td>
+<td>あり（Caddy Auto HTTPS）</td>
+<td>不要（ローカル通信のみ）</td>
+</tr>
+<tr>
+<td>HTTP BasicAuth</td>
+<td>あり（Caddy経由）</td>
+<td>不要（Caddyなし）</td>
+</tr>
+<tr>
+<td>Gateway Token</td>
+<td>あり</td>
+<td>あり</td>
+</tr>
+<tr>
+<td>デバイスペアリング</td>
+<td>あり</td>
+<td>設定可能（未使用）</td>
+</tr>
+</tbody>
+</table></div>
+<h3>脅威モデルの違い</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>VPS（本番）</th>
+<th>ローカルPC（開発）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公開状態</td>
+<td>インターネット全体に公開</td>
+<td>ローカルネットワーク内のみ</td>
+</tr>
+<tr>
+<td>攻撃対象範囲</td>
+<td>全世界からの攻撃が届く</td>
+<td>同じネットワーク内の人のみ</td>
+</tr>
+<tr>
+<td>想定攻撃者</td>
+<td>不特定多数の外部攻撃者</td>
+<td>同一ネットワーク内の侵入者</td>
+</tr>
+</tbody>
+</table></div>
+<h3>ローカルPCのセキュリティ構成</h3>
+<p>ローカルPCはインターネットに公開されていないため、4層防御のうちレイヤー1〜3は不要です。</p>
+<pre><code>ローカルネットワーク / Tailscale VPN
+    |
+    v
+[SSH] 鍵認証（パスワード認証無効）
+    |
+    v
+[ネットワーク分離] 127.0.0.1 バインド
+    |
+    v
+[OpenClaw Gateway] Token認証
+</code></pre>
+<h2>使用技術スタック</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>技術</th>
+<th>用途</th>
+<th>選定理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UFW</td>
+<td>ホストファイアウォール</td>
+<td>Ubuntu標準、シンプルなルール定義</td>
+</tr>
+<tr>
+<td>Caddy</td>
+<td>リバースプロキシ + TLS終端</td>
+<td>Auto HTTPS、設定ファイルが最小</td>
+</tr>
+<tr>
+<td>Docker Compose</td>
+<td>コンテナオーケストレーション</td>
+<td>ネットワーク分離、ポートマッピング制御</td>
+</tr>
+<tr>
+<td>OpenClaw</td>
+<td>AIエージェントプラットフォーム</td>
+<td>Token認証 + デバイスペアリング機能が内蔵</td>
+</tr>
+</tbody>
+</table></div>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="05-security-ai.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">🛡️ AIの8つの安全装置</span>
+            </a>
+            
+            
+            <a href="07-deployment.html" class="nav-card next">
+                <span class="nav-label">次の章 →</span>
+                <span class="nav-title">🚀 デプロイ手順</span>
+            </a>
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>

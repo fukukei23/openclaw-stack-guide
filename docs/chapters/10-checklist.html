@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>チェックリスト — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack チェックリストの解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="チェックリスト — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack チェックリストの解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="09-operations.html" class="nav-prev">← 運用手順</a>
+            
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>チェックリスト</h1>
+<div class="callout callout-info"><p>デプロイ前後の確認項目一覧です。
+各項目のコマンドを実行し、結果を確認してから「完了」にしてください。</p></div>
+<h2>デプロイ前チェック</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>確認コマンド</th>
+<th>期待される結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DNSがVPSのIPを向いている</td>
+<td><code>dig +short example.com</code></td>
+<td>VPSのIPアドレスが表示される</td>
+</tr>
+<tr>
+<td>SSH鍵認証が動作する</td>
+<td><code>ssh deployer@&lt;VPS_IP&gt;</code></td>
+<td>パスワードなしでログインできる</td>
+</tr>
+<tr>
+<td>Dockerがインストール済み</td>
+<td><code>docker --version</code></td>
+<td>バージョン番号が表示される</td>
+</tr>
+<tr>
+<td>Docker Composeがインストール済み</td>
+<td><code>docker compose version</code></td>
+<td>バージョン番号が表示される</td>
+</tr>
+<tr>
+<td>UFWが有効</td>
+<td><code>sudo ufw status</code></td>
+<td>Status: active</td>
+</tr>
+<tr>
+<td>.envファイルが存在</td>
+<td><code>ls -la .env</code></td>
+<td>ファイルが存在、権限が600</td>
+</tr>
+</tbody>
+</table></div>
+<h2>デプロイ後チェック</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>確認コマンド</th>
+<th>期待される結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TLS + BasicAuth が有効</td>
+<td><code>curl -I https://example.com -u deployer:&lt;password&gt;</code></td>
+<td>200 OK</td>
+</tr>
+<tr>
+<td>Gateway がループバックのみ</td>
+<td><code>sudo ss -ltnp | grep 18789</code></td>
+<td>127.0.0.1 が表示される</td>
+</tr>
+<tr>
+<td>Gateway が外部から見えない</td>
+<td><code>sudo nmap -p 18789 &lt;VPS_IP&gt;</code></td>
+<td>filtered または closed</td>
+</tr>
+<tr>
+<td>UFWルールが正しい</td>
+<td><code>sudo ufw status numbered</code></td>
+<td>80/443: allow、22: limit、18789: deny</td>
+</tr>
+<tr>
+<td>コンテナが稼働中</td>
+<td><code>docker compose ps</code></td>
+<td>すべて Up/Healthy</td>
+</tr>
+<tr>
+<td>ヘルスチェック成功</td>
+<td><code>curl -u deployer:&lt;password&gt; https://example.com/status</code></td>
+<td>health: ok</td>
+</tr>
+<tr>
+<td>ログが取得できる</td>
+<td><code>docker compose logs --tail 10 gateway</code></td>
+<td>エラーなし</td>
+</tr>
+</tbody>
+</table></div>
+<h2>定期運用チェック（月次）</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>確認コマンド</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ペアリング済みデバイスの見直し</td>
+<td><code>docker compose exec gateway openclaw devices list</code></td>
+</tr>
+<tr>
+<td>トークンの有効性</td>
+<td><code>docker compose exec gateway openclaw gateway token list</code></td>
+</tr>
+<tr>
+<td>ディスク容量</td>
+<td><code>df -h /</code></td>
+</tr>
+<tr>
+<td>ログの肥大化</td>
+<td><code>du -sh /var/log/caddy/</code></td>
+</tr>
+<tr>
+<td>セキュリティアップデート</td>
+<td><code>sudo apt list --upgradable</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2>セキュリティチェック</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>確認コマンド</th>
+<th>期待される結果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gatewayポートが外部から閉じている</td>
+<td><code>sudo nmap -p 18789 &lt;VPS_IP&gt;</code></td>
+<td>filtered/closed</td>
+</tr>
+<tr>
+<td>HTTPSが強制されている</td>
+<td><code>curl -I http://example.com</code></td>
+<td>301/302 リダイレクト</td>
+</tr>
+<tr>
+<td>BasicAuthなしではアクセス不可</td>
+<td><code>curl -I https://example.com</code></td>
+<td>401 Unauthorized</td>
+</tr>
+<tr>
+<td>fail2banが稼働中</td>
+<td><code>sudo systemctl status fail2ban</code></td>
+<td>active (running)</td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-danger"><p><strong>重要</strong>: 各コマンドを実行して実際に結果を確認するまでは「完了」にしないでください。</p></div>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="09-operations.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">🔧 運用手順</span>
+            </a>
+            
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>

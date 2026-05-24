@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIの8つの安全装置 — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack AIの8つの安全装置の解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="AIの8つの安全装置 — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack AIの8つの安全装置の解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="04-security-why.html" class="nav-prev">← なぜセキュリティが必要か</a>
+            
+            
+            <a href="06-security-portfolio.html" class="nav-next">セキュリティ設計 →</a>
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>AIの8つの安全装置</h1>
+<div class="callout callout-info"><p>IT知識ゼロでも読める、AIエージェントのセキュリティ解説</p></div>
+<h2>全体まとめ</h2>
+<p>これら8つの仕組みはまとめると、**「AIという超優秀だけど、時々大ボケをかましたり暴走したりする危なっかしい助手」から、私たちの大切な個人情報や会社のシステムを守るための「多重の安全装置」**です。</p>
+<p>どんなに賢いAIにも人間が100%安心して任せられるわけではないため、このように何重にも「見えないパトロール隊」が私たちを守ってくれているのです。</p>
+<hr />
+<h2>1. PII自動マスキング — 「自動で黒塗りしてくれる郵便局」</h2>
+<p>お客さんが「田中太郎（電話番号：090-…）の見積もりを」とAIに送る時、<strong>郵便局（プロキシ）が勝手に「〇〇様（電話番号：</strong><em>）」と黒塗りにしてから</em>*AIに渡す仕組みです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>AIに仕事を頼む前に、名前・住所などプライベートな情報を自動で隠す</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>お客さんの個人情報がAIにそのまま渡り、どこかから漏れる大事故につながる</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>2. 最小権限＋RBAC＋非rootユーザー — 「鍵の数を制限されたアルバイト」</h2>
+<p>外壁を塗るだけのアルバイトに、<strong>金庫や社長室のマスターキーは渡しません</strong>よね。「道具箱」と「トイレ」の鍵だけ渡すようなものです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>AIや担当者に「その仕事に絶対必要な権限だけ」を与える</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>AIが乗っ取られた時、会社のシステム全体を自由に破壊・盗まれてしまう</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>3. Dockerサンドボックス — 「ガラス張りの密室作業部屋」</h2>
+<p>激しい料理をさせたいなら、<strong>汚れてもいい密室の部屋で作業させる</strong>。その部屋の外には汚れが広がらない仕組みです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>AIの作業場所を完全に切り離し、暴走しても外のシステムに影響が出ないようにする</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>AIが暴走した瞬間にパソコン全体がフリーズ・壊れて業務が完全停止する</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>4. 外部モデレーションAPI常時監視 — 「優秀なボディーガード兼監視員」</h2>
+<p>AIがお客さんと話している横に常に監視員が立ち、<strong>「爆弾の作り方を教えて」などの危ない会話をしようとしたら即座に口をふさぐ</strong>ようなものです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>AIの入出力を常時監視し、ルール違反や危険な内容を自動で遮断する</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>AIが悪意ある質問に答えてしまい、会社の極秘情報が外に出る大スキャンダルが起きる</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>5. CoTログ全件保存 — 「AIの作業カメラ＋日記」</h2>
+<p>AIが「なぜこの答えを選んだのか」「どんな手順で考えたのか」を、<strong>常にカメラで録画しながら日記にも書き残している</strong>ようなものです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>AIがどう考えて行動したか、思考プロセスをすべて記録・保存しておく</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>AIが致命的なミスをしても「なぜそうなったのか」が分からず、同じ事故を防げない</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>6. HITL承認フロー — 「高い買い物は社長のサインが必要」</h2>
+<p>アルバイト（AI）が100万円の値引きを提案したい時、<strong>勝手に決めずに必ず社長（人間）に「これでいいですか？」と確認してサインをもらう</strong>ようなものです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>リスクが高い行動は、人間がOKを出すまでAIが実行しない</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>AIの判断ミスで、会社に億単位の損害を与える操作を勝手に実行してしまう</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>7. Pydantic構造化出力＋リトライ — 「うるさい確認マシン」</h2>
+<p>AIが提出したレポートが決まったフォーマットから外れていたり文字化けしていたりした時、<strong>「やり直し！」と自動で突き返す</strong>ようなものです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>AIの答えがルール通りでない場合、正しい形になるまで自動でやり直させる</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>AIがめちゃくちゃなデータを出力して、後のシステムがエラーを起こして止まる</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>8. Redisによる外部ステート管理 — 「安全な外部ロッカー」</h2>
+<p>作業中のAIが「今どこまで作業したか」「次は何をする予定か」を、<strong>自分の頭の中ではなく安全な外部のロッカーにメモとして保存</strong>しておくようなものです。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>項目</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>何をする？</strong></td>
+<td>AIの「作業中の状態や記憶」を外部の安全な保存場所に預けておく</td>
+</tr>
+<tr>
+<td><strong>これがないと？</strong></td>
+<td>AIが途中でフリーズした瞬間に記憶がリセットされ、最初から全部やり直しになる</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2>実装優先度</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>優先度</th>
+<th>項目</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最高</td>
+<td>PIIマスキング + RBAC</td>
+<td>データ漏洩リスク直結</td>
+</tr>
+<tr>
+<td>最高</td>
+<td>HITL承認ゲート</td>
+<td>不可逆アクション防止</td>
+</tr>
+<tr>
+<td>高</td>
+<td>Sentinelパーサー</td>
+<td>非決定的出力への堅牢化</td>
+</tr>
+<tr>
+<td>高</td>
+<td>Dockerサンドボックス</td>
+<td>ホスト環境保護</td>
+</tr>
+<tr>
+<td>中</td>
+<td>Redisステート管理</td>
+<td>障害耐性・再開可能性</td>
+</tr>
+<tr>
+<td>中</td>
+<td>CoTログ全件保存</td>
+<td>事後検証・説明責任</td>
+</tr>
+<tr>
+<td>通常</td>
+<td>モデレーション監視</td>
+<td>継続的品質改善</td>
+</tr>
+</tbody>
+</table></div>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="04-security-why.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">🔒 なぜセキュリティが必要か</span>
+            </a>
+            
+            
+            <a href="06-security-portfolio.html" class="nav-card next">
+                <span class="nav-label">次の章 →</span>
+                <span class="nav-title">🔐 セキュリティ設計</span>
+            </a>
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>

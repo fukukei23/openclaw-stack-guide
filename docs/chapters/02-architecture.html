@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アーキテクチャ — OpenClaw Stack Guide</title>
+    <meta name="description" content="OpenClaw Stack アーキテクチャの解説 — AIエージェントプラットフォーム構築ガイド">
+    <meta property="og:title" content="アーキテクチャ — OpenClaw Stack Guide">
+    <meta property="og:description" content="OpenClaw Stack アーキテクチャの解説">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://<USERNAME>.github.io/openclaw-stack-guide/assets/ogp.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <button class="menu-toggle" aria-label="メニュー" id="menuToggle">
+            <span></span><span></span><span></span>
+        </button>
+        <a href="../index.html" class="site-title">🤖 OpenClaw Stack Guide</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
+            <span class="icon-light">☀️</span>
+            <span class="icon-dark">🌙</span>
+        </button>
+    </header>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html">🏠 ホーム</a>
+        </div>
+        
+        <a href="00-cheatsheet.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">📋</span>
+            早見表
+        </a>
+        
+        <a href="01-basics.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🤖</span>
+            OpenClaw Stackとは
+        </a>
+        
+        <a href="02-architecture.html"
+           class="sidebar-link active">
+            <span class="sidebar-icon">🏗️</span>
+            アーキテクチャ
+        </a>
+        
+        <a href="03-network.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🌐</span>
+            ネットワーク
+        </a>
+        
+        <a href="04-security-why.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔒</span>
+            なぜセキュリティが必要か
+        </a>
+        
+        <a href="05-security-ai.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🛡️</span>
+            AIの8つの安全装置
+        </a>
+        
+        <a href="06-security-portfolio.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔐</span>
+            セキュリティ設計
+        </a>
+        
+        <a href="07-deployment.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🚀</span>
+            デプロイ手順
+        </a>
+        
+        <a href="08-local-setup.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">💻</span>
+            ローカル環境構築
+        </a>
+        
+        <a href="09-operations.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">🔧</span>
+            運用手順
+        </a>
+        
+        <a href="10-checklist.html"
+           class="sidebar-link">
+            <span class="sidebar-icon">✅</span>
+            チェックリスト
+        </a>
+        
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="content">
+        <div class="chapter-nav-top">
+            
+            <a href="01-basics.html" class="nav-prev">← OpenClaw Stackとは</a>
+            
+            
+            <a href="03-network.html" class="nav-next">ネットワーク →</a>
+            
+        </div>
+
+        <article class="chapter-body">
+            <h1>アーキテクチャ</h1>
+<h2>システム構成</h2>
+<p>OpenClaw Stack（VPS環境）は、大きく3つのコンポーネントで構成されています。</p>
+<pre><code>インターネットからのアクセス
+        |
+   TLS + BasicAuth（暗号化 + 認証）
+        |
+  +--------------+
+  |    Caddy     |  ← リバースプロキシ（門番）
+  +--------------+
+        |
+  ループバック 127.0.0.1:18789（内部通信のみ）
+        |
+  +----------------+
+  | OpenClaw       |
+  | Gateway Container | ← AIエージェントの実行環境
+  +----------------+
+        |
+  外部APIへのHTTPSリクエスト
+        |
+  +----------------+
+  | LLM API        | ← テキスト生成AI
+  +----------------+
+</code></pre>
+<h2>各コンポーネントの役割</h2>
+<h3>Caddy（リバースプロキシ）</h3>
+<p>CaddyはインターネットとOpenClaw Gatewayの間に立つ「門番」です。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>役割</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TLS終端</td>
+<td>HTTPS通信の暗号化を処理（Let's Encryptで自動更新）</td>
+</tr>
+<tr>
+<td>BasicAuth</td>
+<td>ユーザー名とパスワードによる認証</td>
+</tr>
+<tr>
+<td>リバースプロキシ</td>
+<td>認証を通った通信だけをGatewayに中継</td>
+</tr>
+<tr>
+<td>アクセスログ</td>
+<td>すべてのアクセスを記録</td>
+</tr>
+</tbody>
+</table></div>
+<h3>OpenClaw Gateway（AI実行環境）</h3>
+<p>GatewayがAIエージェントの本体です。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>役割</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>エージェント実行</td>
+<td>AIエージェントのワークフローを実行</td>
+</tr>
+<tr>
+<td>ペアリング管理</td>
+<td>許可されたデバイスの登録・管理</td>
+</tr>
+<tr>
+<td>トークン認証</td>
+<td>Gateway固有の認証トークンによるアクセス制御</td>
+</tr>
+<tr>
+<td>API中継</td>
+<td>LLM APIへのリクエストを管理</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Dockerネットワーク</h3>
+<p>コンテナ同士は専用のDockerネットワーク（<code>172.30.0.0/24</code>）で接続されます。</p>
+<ul>
+<li>Caddy: <code>172.30.0.10</code></li>
+<li>Gateway: <code>172.30.0.20</code></li>
+</ul>
+<p>このネットワークは外部からは見えません。</p>
+<div class="mermaid-wrapper"><div class="mermaid">
+graph TD
+    Client["👤 クライアント"] --> Caddy["🔑 Caddy<br/>TLS終端 + BasicAuth"]
+    Caddy -->|"127.0.0.1:18789"| GW["🤖 OpenClaw Gateway<br/>トークン認証 + デバイスペアリング"]
+    GW --> Agent["🤖 エージェント<br/>ワークフロー実行"]
+    Agent -->|"HTTPS"| API["☁️ LLM API<br/>テキスト生成"]
+</div></div><h2>責任境界</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>層</th>
+<th>担う責任</th>
+<th>障害時の影響</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Caddy（エッジ）</td>
+<td>TLS・認証・ログ</td>
+<td>アクセス不能（Gateway自体は健在）</td>
+</tr>
+<tr>
+<td>Gateway（コントロールプレーン）</td>
+<td>エージェント実行・認証・状態管理</td>
+<td>全サービス停止</td>
+</tr>
+<tr>
+<td>LLM API（プロバイダー）</td>
+<td>テキスト生成</td>
+<td>AIの応答不可（システム自体は稼働）</td>
+</tr>
+</tbody>
+</table></div>
+<h2>データフロー</h2>
+<p>ユーザーがAIにリクエストを送ってから応答が返るまでの流れ：</p>
+<ol>
+<li><strong>クライアント → Caddy</strong>: HTTPSリクエスト（TLS暗号化 + BasicAuth認証）</li>
+<li><strong>Caddy → Gateway</strong>: 認証済みリクエストを <code>127.0.0.1:18789</code> にプロキシ</li>
+<li><strong>Gateway</strong>: トークン・ペアリング認証 → エージェントにルーティング</li>
+<li><strong>エージェント → LLM API</strong>: 外部APIに推論リクエスト</li>
+<li><strong>応答</strong>: LLM → エージェント → Gateway → Caddy → クライアント</li>
+</ol>
+<div class="callout callout-danger"><p><strong>重要</strong>: Gatewayは絶対に <code>0.0.0.0</code>（全インターフェース）にバインドしてはいけません。Caddyだけが唯一の入口です。</p></div>
+
+        </article>
+
+        <nav class="chapter-nav-bottom">
+            
+            <a href="01-basics.html" class="nav-card prev">
+                <span class="nav-label">← 前の章</span>
+                <span class="nav-title">🤖 OpenClaw Stackとは</span>
+            </a>
+            
+            
+            <a href="03-network.html" class="nav-card next">
+                <span class="nav-label">次の章 →</span>
+                <span class="nav-title">🌐 ネットワーク</span>
+            </a>
+            
+        </nav>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+            themeVariables: { fontSize: '14px' }
+        });
+    </script>
+</body>
+</html>
