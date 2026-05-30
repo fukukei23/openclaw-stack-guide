@@ -1,145 +1,169 @@
 <!DOCTYPE html>
-<html lang="ja" data-theme="light">
+<html lang="ja" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenClaw Stack ガイド</title>
-    <meta name="description" content="AIエージェントプラットフォーム OpenClaw Stack の構築・運用を初心者向けに完全解説">
-    <meta property="og:title" content="OpenClaw Stack ガイド">
-    <meta property="og:description" content="AIエージェントプラットフォーム OpenClaw Stack の構築・運用を初心者向けに完全解説">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://fukukei23.github.io/openclaw-stack-guide/assets/ogp.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenClaw — AIエージェントプラットフォーム</title>
+<meta name="description" content="複数のAIエージェントが協調して動く自律型プラットフォーム。Docker・Caddy・VPSで構築するマルチエージェント基盤。">
+<meta property="og:title" content="OpenClaw — AIエージェントプラットフォーム">
+<meta property="og:description" content="複数のAIエージェントが協調して動く自律型プラットフォーム">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fukukei23.github.io/openclaw-stack-guide/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦀</text></svg>">
+<style>
+  :root {
+    --bg:#0d1117; --bg2:#161b22; --bg3:#21262d;
+    --text:#c9d1d9; --text2:#8b949e;
+    --accent:#58a6ff; --accent2:#79c0ff;
+    --green:#3fb950; --purple:#d2a8ff; --orange:#ffa657;
+    --border:#30363d;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+  header { position:sticky; top:0; z-index:100; background:rgba(13,17,23,0.9); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; justify-content:space-between; }
+  .logo { font-size:1.1em; font-weight:bold; color:var(--accent); }
+  nav { display:flex; gap:20px; }
+  nav a { color:var(--text2); text-decoration:none; font-size:0.9em; }
+  nav a:hover { color:var(--accent); }
+  .hero { padding:80px 24px 60px; text-align:center; max-width:800px; margin:0 auto; }
+  .hero-badge { display:inline-block; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.3); color:var(--accent); padding:4px 14px; border-radius:20px; font-size:0.82em; margin-bottom:20px; }
+  .hero h1 { font-size:2.4em; font-weight:800; line-height:1.2; margin-bottom:16px; background:linear-gradient(135deg,var(--accent2),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { font-size:1.05em; color:var(--text2); margin-bottom:32px; }
+  .hero-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn { padding:10px 24px; border-radius:8px; font-size:0.95em; text-decoration:none; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:var(--accent); color:#0d1117; }
+  .btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
+  .btn-secondary { background:var(--bg3); color:var(--text); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+  .arch { max-width:680px; margin:0 auto 60px; padding:0 24px; }
+  .arch-diagram { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:24px; font-family:'Fira Code',monospace; font-size:0.82em; color:var(--text2); line-height:2; overflow-x:auto; white-space:pre; }
+  .section { max-width:900px; margin:0 auto 60px; padding:0 24px; }
+  .section-title { text-align:center; font-size:1.3em; font-weight:700; margin-bottom:6px; color:var(--accent2); }
+  .section-sub { text-align:center; color:var(--text2); font-size:0.88em; margin-bottom:24px; }
+  .agent-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; }
+  .agent-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:16px; }
+  .agent-card:hover { border-color:var(--accent); }
+  .agent-icon { font-size:1.8em; margin-bottom:8px; }
+  .agent-name { font-weight:700; font-size:0.95em; margin-bottom:4px; color:var(--accent2); }
+  .agent-role { font-size:0.82em; color:var(--text2); }
+  .stack-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; }
+  .stack-item { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:14px 12px; text-align:center; }
+  .s-icon { font-size:1.5em; margin-bottom:6px; }
+  .s-name { font-size:0.85em; font-weight:600; }
+  .s-role { font-size:0.75em; color:var(--text2); margin-top:2px; }
+  .chapter-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; }
+  .chapter-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:14px; text-decoration:none; color:var(--text); display:block; transition:all 0.2s; }
+  .chapter-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+  .ch-num { font-size:0.75em; color:var(--text2); margin-bottom:2px; }
+  .ch-icon { font-size:1.3em; margin-bottom:4px; }
+  .ch-title { font-size:0.88em; font-weight:600; color:var(--accent2); margin-bottom:3px; }
+  .ch-desc { font-size:0.78em; color:var(--text2); }
+  footer { border-top:1px solid var(--border); padding:24px; text-align:center; color:var(--text2); font-size:0.85em; }
+  footer a { color:var(--accent); text-decoration:none; }
+</style>
 </head>
-<body class="index-page">
-    <header class="site-header">
-        <span class="site-title">🤖 OpenClaw Stack Guide</span>
-        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">
-            <span class="icon-light">☀️</span>
-            <span class="icon-dark">🌙</span>
-        </button>
-    </header>
+<body>
 
-    <main class="content">
-        <section class="hero">
-            <h1>OpenClaw Stack ガイド</h1>
-            <p>AIエージェントプラットフォーム OpenClaw Stack の<br>構築・運用を初心者向けに完全解説</p>
-        </section>
+<header>
+  <div class="logo">🦀 OpenClaw</div>
+  <nav>
+    <a href="#agents">エージェント</a>
+    <a href="#stack">スタック</a>
+    <a href="#guide">ガイド</a>
+    <a href="https://github.com/fukukei23/openclaw-stack" target="_blank">GitHub</a>
+  </nav>
+</header>
 
-        <section class="chapter-grid">
-            
-            <a href="chapters/00-cheatsheet.html" class="chapter-card">
-                <div class="card-icon">📋</div>
-                <div class="card-number">第00章</div>
-                <h2 class="card-title">早見表</h2>
-                <p class="card-desc">コマンド・ポート・ファイル一覧チートシート</p>
-            </a>
-            
-            <a href="chapters/01-basics.html" class="chapter-card">
-                <div class="card-icon">🤖</div>
-                <div class="card-number">第01章</div>
-                <h2 class="card-title">OpenClaw Stackとは</h2>
-                <p class="card-desc">AIエージェントプラットフォームの概要と2つの環境</p>
-            </a>
-            
-            <a href="chapters/02-architecture.html" class="chapter-card">
-                <div class="card-icon">🏗️</div>
-                <div class="card-number">第02章</div>
-                <h2 class="card-title">アーキテクチャ</h2>
-                <p class="card-desc">Docker・Caddy・Gatewayのシステム構成</p>
-            </a>
-            
-            <a href="chapters/03-network.html" class="chapter-card">
-                <div class="card-icon">🌐</div>
-                <div class="card-number">第03章</div>
-                <h2 class="card-title">ネットワーク</h2>
-                <p class="card-desc">ポート・ドメイン・ファイアウォール設定</p>
-            </a>
-            
-            <a href="chapters/04-security-why.html" class="chapter-card">
-                <div class="card-icon">🔒</div>
-                <div class="card-number">第04章</div>
-                <h2 class="card-title">なぜセキュリティが必要か</h2>
-                <p class="card-desc">4層防御を初心者向けに解説</p>
-            </a>
-            
-            <a href="chapters/05-security-ai.html" class="chapter-card">
-                <div class="card-icon">🛡️</div>
-                <div class="card-number">第05章</div>
-                <h2 class="card-title">AIの8つの安全装置</h2>
-                <p class="card-desc">PIIマスキング・RBAC・サンドボックス等を例えで解説</p>
-            </a>
-            
-            <a href="chapters/06-security-portfolio.html" class="chapter-card">
-                <div class="card-icon">🔐</div>
-                <div class="card-number">第06章</div>
-                <h2 class="card-title">セキュリティ設計</h2>
-                <p class="card-desc">技術的なセキュリティ設計と環境別比較</p>
-            </a>
-            
-            <a href="chapters/07-deployment.html" class="chapter-card">
-                <div class="card-icon">🚀</div>
-                <div class="card-number">第07章</div>
-                <h2 class="card-title">デプロイ手順</h2>
-                <p class="card-desc">VPSへのデプロイ手順（Docker・Caddy・初期設定）</p>
-            </a>
-            
-            <a href="chapters/08-local-setup.html" class="chapter-card">
-                <div class="card-icon">💻</div>
-                <div class="card-number">第08章</div>
-                <h2 class="card-title">ローカル環境構築</h2>
-                <p class="card-desc">Surface Go等でのローカル開発環境構築</p>
-            </a>
-            
-            <a href="chapters/09-operations.html" class="chapter-card">
-                <div class="card-icon">🔧</div>
-                <div class="card-number">第09章</div>
-                <h2 class="card-title">運用手順</h2>
-                <p class="card-desc">ヘルスチェック・ログ・トラブルシューティング</p>
-            </a>
-            
-            <a href="chapters/10-checklist.html" class="chapter-card">
-                <div class="card-icon">✅</div>
-                <div class="card-number">第10章</div>
-                <h2 class="card-title">チェックリスト</h2>
-                <p class="card-desc">デプロイ前後の確認項目一覧</p>
-            </a>
-            
-        </section>
+<section class="hero">
+  <div class="hero-badge">🚀 個人開発 × AIエージェント基盤</div>
+  <h1>複数のAIエージェントが<br>協調して動く基盤</h1>
+  <p>Docker・Caddy・VPS で構築するマルチエージェントプラットフォーム。<br>
+  コード生成・Discord操作・ナレッジ管理を自律的に実行。</p>
+  <div class="hero-actions">
+    <a href="#guide" class="btn btn-primary">📖 構築ガイドを読む</a>
+    <a href="https://github.com/fukukei23/openclaw-stack" target="_blank" class="btn btn-secondary">⭐ GitHub</a>
+  </div>
+</section>
 
-        <section class="features">
-            <h2>📖 このガイドの特徴</h2>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <span class="feature-icon">🎯</span>
-                    <h3>初心者向け</h3>
-                    <p>専門用語は初出時に説明。前提知識不要</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">📊</span>
-                    <h3>図解付き</h3>
-                    <p>アーキテクチャやセキュリティを図で視覚化</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">📱</span>
-                    <h3>モバイル対応</h3>
-                    <p>スマホからいつでも見返せるレスポンシブデザイン</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🌙</span>
-                    <h3>ダークモード</h3>
-                    <p>目に優しいテーマ切替対応</p>
-                </div>
-            </div>
-        </section>
-    </main>
+<div class="arch">
+  <div class="arch-diagram">Internet
+    │
+    ▼
+Caddy  (Reverse Proxy + HTTPS自動取得)
+    │
+    ├── fukurou   Claude Code エージェント
+    ├── krokod    Discord Bot エージェント
+    ├── yotsuba   サブエージェント
+    └── obsidian  ナレッジベース (SSOT)
 
-    <footer class="site-footer">
-        <p>OpenClaw Stack Guide — <a href="https://github.com/fukukei23/openclaw-stack-guide">GitHub</a></p>
-    </footer>
+Docker Compose on VPS (Ubuntu 22.04)</div>
+</div>
 
-    <script src="assets/script.js"></script>
+<section class="section" id="agents">
+  <div class="section-title">エージェント構成</div>
+  <div class="section-sub">各エージェントが役割を分担して協調動作</div>
+  <div class="agent-grid">
+    <div class="agent-card">
+      <div class="agent-icon">🦉</div>
+      <div class="agent-name">fukurou</div>
+      <div class="agent-role">Claude Code メインエージェント。コード生成・レビュー・SSOT管理を担当</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-icon">💀</div>
+      <div class="agent-name">krokod</div>
+      <div class="agent-role">Discord Bot エージェント。スマホ・外出先からClaude Codeをリモート操作</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-icon">🍀</div>
+      <div class="agent-name">yotsuba</div>
+      <div class="agent-role">サブエージェント。並列タスク処理・情報収集・テックニュース生成</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-icon">📚</div>
+      <div class="agent-name">obsidian</div>
+      <div class="agent-role">ナレッジベース連携。SSOT（Single Source of Truth）管理・全エージェント共有</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="stack">
+  <div class="section-title">技術スタック</div>
+  <div class="section-sub">シンプルで再現性の高い構成</div>
+  <div class="stack-grid">
+    <div class="stack-item"><div class="s-icon">🐳</div><div class="s-name">Docker</div><div class="s-role">コンテナ管理</div></div>
+    <div class="stack-item"><div class="s-icon">🔒</div><div class="s-name">Caddy</div><div class="s-role">リバースプロキシ + HTTPS</div></div>
+    <div class="stack-item"><div class="s-icon">☁️</div><div class="s-name">VPS</div><div class="s-role">Ubuntu 22.04</div></div>
+    <div class="stack-item"><div class="s-icon">🌐</div><div class="s-name">Tailscale</div><div class="s-role">プライベートネット</div></div>
+    <div class="stack-item"><div class="s-icon">🤖</div><div class="s-name">Claude Code</div><div class="s-role">AIエージェント実行</div></div>
+    <div class="stack-item"><div class="s-icon">📝</div><div class="s-name">Obsidian</div><div class="s-role">ナレッジ管理</div></div>
+  </div>
+</section>
+
+<section class="section" id="guide">
+  <div class="section-title">構築・運用ガイド</div>
+  <div class="section-sub">初心者でも再現できる11章の完全ガイド</div>
+  <div class="chapter-grid">
+    <a href="chapters/00-cheatsheet.html" class="chapter-card"><div class="ch-num">第00章</div><div class="ch-icon">📋</div><div class="ch-title">早見表</div><div class="ch-desc">コマンド・ポート・ファイル一覧</div></a>
+    <a href="chapters/01-basics.html" class="chapter-card"><div class="ch-num">第01章</div><div class="ch-icon">🤖</div><div class="ch-title">OpenClaw Stackとは</div><div class="ch-desc">概要と2つの環境</div></a>
+    <a href="chapters/02-architecture.html" class="chapter-card"><div class="ch-num">第02章</div><div class="ch-icon">🏗️</div><div class="ch-title">アーキテクチャ</div><div class="ch-desc">Docker・Caddy・Gateway構成</div></a>
+    <a href="chapters/03-network.html" class="chapter-card"><div class="ch-num">第03章</div><div class="ch-icon">🌐</div><div class="ch-title">ネットワーク</div><div class="ch-desc">ポート・UFW・トラフィック</div></a>
+    <a href="chapters/04-why-security.html" class="chapter-card"><div class="ch-num">第04章</div><div class="ch-icon">🛡️</div><div class="ch-title">なぜセキュリティが必要か</div><div class="ch-desc">4層防御を初心者向けに解説</div></a>
+    <a href="chapters/05-ai-safety.html" class="chapter-card"><div class="ch-num">第05章</div><div class="ch-icon">🔐</div><div class="ch-title">AIの8つの安全装置</div><div class="ch-desc">PIIマスキング・RBAC等</div></a>
+    <a href="chapters/06-security-design.html" class="chapter-card"><div class="ch-num">第06章</div><div class="ch-icon">⚔️</div><div class="ch-title">セキュリティ設計</div><div class="ch-desc">技術的な多層防御設計</div></a>
+    <a href="chapters/07-deploy.html" class="chapter-card"><div class="ch-num">第07章</div><div class="ch-icon">🚀</div><div class="ch-title">デプロイ手順</div><div class="ch-desc">VPSへのデプロイ</div></a>
+    <a href="chapters/08-local.html" class="chapter-card"><div class="ch-num">第08章</div><div class="ch-icon">💻</div><div class="ch-title">ローカル環境構築</div><div class="ch-desc">Linuxマシンでの開発環境</div></a>
+    <a href="chapters/09-operations.html" class="chapter-card"><div class="ch-num">第09章</div><div class="ch-icon">⚙️</div><div class="ch-title">運用手順</div><div class="ch-desc">ヘルスチェック・ログ・障害対応</div></a>
+    <a href="chapters/10-checklist.html" class="chapter-card"><div class="ch-num">第10章</div><div class="ch-icon">✅</div><div class="ch-title">チェックリスト</div><div class="ch-desc">デプロイ前の最終確認</div></a>
+  </div>
+</section>
+
+<footer>
+  <p>Built by <a href="https://github.com/fukukei23" target="_blank">fukukei23</a> &nbsp;·&nbsp;
+  <a href="https://github.com/fukukei23/openclaw-stack" target="_blank">openclaw-stack</a> &nbsp;·&nbsp;
+  <a href="https://fukukei23.github.io/guides/" target="_blank">guides</a> &nbsp;·&nbsp;
+  <a href="https://fukukei23.github.io/claude-code-guide/" target="_blank">claude-code-guide</a></p>
+</footer>
+
 </body>
 </html>
