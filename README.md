@@ -60,6 +60,7 @@ open docs/index.html
 
 - [openclaw-stack](https://github.com/fukukei23/openclaw-stack) — 元となるインフラ構成管理リポジトリ
 - [claude-code-guide](https://github.com/fukukei23/claude-code-guide) — 同パターンのClaude Codeガイド
+- [loop-engineering-guide](https://github.com/fukukei23/loop-engineering-guide) — OpenClawをループの象徴的実装として位置づけた教科書（ループエンジニアリング概念→設計→実践→運用）
 
 ## ライセンス
 
