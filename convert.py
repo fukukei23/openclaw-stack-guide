@@ -187,7 +187,7 @@ CHAPTER_TEMPLATE = Template("""\
         </div>
 
         <article class="chapter-body">
-            {{ content }}
+            {{ content|safe }}
         </article>
 
         <nav class="chapter-nav-bottom">
@@ -217,7 +217,7 @@ CHAPTER_TEMPLATE = Template("""\
     </script>
 </body>
 </html>
-""")
+""", autoescape=True)
 
 INDEX_TEMPLATE = Template("""\
 <!DOCTYPE html>
@@ -295,7 +295,7 @@ INDEX_TEMPLATE = Template("""\
     <script src="assets/script.js"></script>
 </body>
 </html>
-""")
+""", autoescape=True)
 
 
 # --- フィルタリング ---
@@ -332,7 +332,7 @@ def filter_sections(text: str) -> str:
 
 def convert_md_to_html(md_text: str) -> str:
     """MarkdownをHTMLに変換."""
-    md = MarkdownIt("commonmark", {"html": True}).enable("table")
+    md = MarkdownIt("commonmark", {"html": False}).enable("table")
     return md.render(md_text)
 
 
